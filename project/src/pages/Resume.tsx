@@ -58,7 +58,7 @@ export default function Resume() {
         }
       />
 
-      <div className="max-w-4xl px-6 pb-12 sm:px-12">
+      <div className="mx-auto max-w-4xl px-6 pb-12 sm:px-12">
         {/* Professional Experience */}
         <section className="mb-14">
           <SectionTitle

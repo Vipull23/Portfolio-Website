@@ -151,7 +151,7 @@ export default function ProjectDetail() {
         }
       />
 
-      <div className="max-w-5xl px-6 pb-12 sm:px-12">
+      <div className="mx-auto max-w-5xl px-6 pb-12 sm:px-12">
         {/* Overview */}
         <section className="mb-16 grid gap-8 md:grid-cols-[2fr_1fr]">
           <div>

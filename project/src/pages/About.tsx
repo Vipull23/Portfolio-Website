@@ -96,7 +96,7 @@ export default function About() {
         }
       />
 
-      <div className="max-w-6xl px-6 pb-20 sm:px-12">
+      <div className="mx-auto max-w-6xl px-6 pb-20 sm:px-12">
         {/* Synopsis + details, like a Netflix title's "About" panel */}
         <motion.section {...fadeUp} className="mb-16 grid gap-10 md:grid-cols-[2fr_1fr]">
           <div>
