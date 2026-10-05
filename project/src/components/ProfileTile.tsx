@@ -23,7 +23,7 @@ export default function ProfileTile({
       >
         {icon}
       </div>
-      <span className="mt-3 text-lg text-[#9b9b9b] transition-all duration-200 group-hover:text-white group-hover:font-bold">
+      <span className="mt-3 text-lg text-nf-muted transition-all duration-200 group-hover:font-bold group-hover:text-white">
         {label}
       </span>
     </button>

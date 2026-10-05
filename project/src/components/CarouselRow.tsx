@@ -1,74 +1,32 @@
-// import { useRef } from 'react';
-// import type { ReactNode } from 'react';
-// import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-// interface CarouselRowProps {
-//   title: string;
-//   children: ReactNode;
-// }
-
-// export default function CarouselRow({ title, children }: CarouselRowProps) {
-//   const scrollRef = useRef<HTMLDivElement>(null);
-
-//   const scroll = (direction: 'left' | 'right') => {
-//     const el = scrollRef.current;
-//     if (!el) return;
-//     const amount = el.clientWidth * 0.8;
-//     el.scrollBy({
-//       left: direction === 'left' ? -amount : amount,
-//       behavior: 'smooth',
-//     });
-//   };
-
-//   return (
-//     <section className="mb-10">
-//       <h2 className="mb-4 text-xl font-semibold text-white sm:text-2xl">
-//         {title}
-//       </h2>
-//       <div className="group/row relative">
-//         <button
-//           onClick={() => scroll('left')}
-//           aria-label={`Scroll ${title} left`}
-//           className="absolute left-0 top-1/2 z-10 flex h-10 w-10 -translate-x-3 -translate-y-1/2 items-center justify-center rounded-full bg-[#141414]/90 text-white opacity-0 shadow-lg transition-opacity duration-200 hover:bg-[#E50914] group-hover/row:opacity-100"
-//         >
-//           <ChevronLeft size={22} />
-//         </button>
-
-//         <div
-//           ref={scrollRef}
-//           className="flex gap-4 overflow-x-auto scroll-smooth pb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory"
-//         >
-//           {children}
-//         </div>
-
-//         <button
-//           onClick={() => scroll('right')}
-//           aria-label={`Scroll ${title} right`}
-//           className="absolute right-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 translate-x-3 items-center justify-center rounded-full bg-[#141414]/90 text-white opacity-0 shadow-lg transition-opacity duration-200 hover:bg-[#E50914] group-hover/row:opacity-100"
-//         >
-//           <ChevronRight size={22} />
-//         </button>
-//       </div>
-//     </section>
-//   );
-// }
-
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface CarouselRowProps {
   title: string;
   children: ReactNode;
-  showArrows?: boolean;
 }
 
-export default function CarouselRow({
-  title,
-  children,
-  showArrows = true,
-}: CarouselRowProps) {
+export default function CarouselRow({ title, children }: CarouselRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateArrows = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 1);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateArrows();
+    const observer = new ResizeObserver(updateArrows);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [updateArrows]);
 
   const scroll = (direction: 'left' | 'right') => {
     const el = scrollRef.current;
@@ -80,34 +38,42 @@ export default function CarouselRow({
     });
   };
 
+  const hasOverflow = canScrollLeft || canScrollRight;
+  const arrowClass =
+    'hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-nf-surface sm:flex text-white shadow-lg transition-all duration-200 hover:bg-nf-red';
+
   return (
     <section className="mb-10">
-      <h2 className="mb-4 text-xl font-semibold text-white sm:text-2xl">
+      <h2 className="mb-2 text-xl font-semibold text-white sm:text-2xl">
         {title}
       </h2>
       <div className="flex items-center gap-2">
-        {showArrows && (
+        {hasOverflow && (
           <button
             onClick={() => scroll('left')}
             aria-label={`Scroll ${title} left`}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1f1f1f] text-white shadow-lg transition-colors duration-200 hover:bg-[#E50914]"
+            disabled={!canScrollLeft}
+            className={`${arrowClass} ${canScrollLeft ? '' : 'pointer-events-none opacity-0'}`}
           >
             <ChevronLeft size={22} />
           </button>
         )}
 
+        {/* Padding gives hover-scaled cards room so the scroll container doesn't clip them. */}
         <div
           ref={scrollRef}
-          className="flex flex-1 gap-4 overflow-x-auto scroll-smooth pb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory"
+          onScroll={updateArrows}
+          className="flex min-w-0 flex-1 snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-2 py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {children}
         </div>
 
-        {showArrows && (
+        {hasOverflow && (
           <button
             onClick={() => scroll('right')}
             aria-label={`Scroll ${title} right`}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1f1f1f] text-white shadow-lg transition-colors duration-200 hover:bg-[#E50914]"
+            disabled={!canScrollRight}
+            className={`${arrowClass} ${canScrollRight ? '' : 'pointer-events-none opacity-0'}`}
           >
             <ChevronRight size={22} />
           </button>
@@ -116,69 +82,3 @@ export default function CarouselRow({
     </section>
   );
 }
-
-
-
-// import { useRef } from 'react';
-// import type { ReactNode } from 'react';
-// import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-// interface CarouselRowProps {
-//   title: string;
-//   children: ReactNode;
-//   showArrows?: boolean;
-// }
-
-// export default function CarouselRow({
-//   title,
-//   children,
-//   showArrows = true,
-// }: CarouselRowProps) {
-//   const scrollRef = useRef<HTMLDivElement>(null);
-
-//   const scroll = (direction: 'left' | 'right') => {
-//     const el = scrollRef.current;
-//     if (!el) return;
-//     const amount = el.clientWidth * 0.8;
-//     el.scrollBy({
-//       left: direction === 'left' ? -amount : amount,
-//       behavior: 'smooth',
-//     });
-//   };
-
-//   return (
-//     <section className="mb-10">
-//       <h2 className="mb-4 text-xl font-semibold text-white sm:text-2xl">
-//         {title}
-//       </h2>
-//       <div className="flex items-center gap-2">
-//         {showArrows && (
-//           <button
-//             onClick={() => scroll('left')}
-//             aria-label={`Scroll ${title} left`}
-//             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1f1f1f] text-white shadow-lg transition-colors duration-200 hover:bg-[#E50914]"
-//           >
-//             <ChevronLeft size={22} />
-//           </button>
-//         )}
-
-//         <div
-//           ref={scrollRef}
-//           className="flex flex-1 gap-4 overflow-x-auto scroll-smooth pb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory"
-//         >
-//           {children}
-//         </div>
-
-//         {showArrows && (
-//           <button
-//             onClick={() => scroll('right')}
-//             aria-label={`Scroll ${title} right`}
-//             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1f1f1f] text-white shadow-lg transition-colors duration-200 hover:bg-[#E50914]"
-//           >
-//             <ChevronRight size={22} />
-//           </button>
-//         )}
-//       </div>
-//     </section>
-//   );
-// }

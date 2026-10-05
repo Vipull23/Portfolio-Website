@@ -1,351 +1,174 @@
-// import Navbar from '@/components/Navbar';
-// import { Download } from 'lucide-react';
-
-// const experience = [
-//   {
-//     role: 'Frontend Developer',
-//     company: 'Tech Co.',
-//     period: '2023 — Present',
-//     bullets: [
-//       'Built reusable component libraries used across multiple products.',
-//       'Improved page load performance by 30% through code splitting.',
-//     ],
-//   },
-//   {
-//     role: 'Junior Developer',
-//     company: 'Startup Studio',
-//     period: '2021 — 2023',
-//     bullets: [
-//       'Developed and maintained client-facing web applications.',
-//       'Collaborated with designers to ship pixel-perfect UIs.',
-//     ],
-//   },
-// ];
-
-// const education = [
-//   {
-//     degree: 'B.S. Computer Science',
-//     school: 'State University',
-//     period: '2017 — 2021',
-//   },
-// ];
-
-// export default function Resume() {
-//   return (
-//     <div className="min-h-screen bg-[#141414] pt-20">
-//       <Navbar />
-//       <div className="mx-auto max-w-3xl px-6 py-12">
-//         {/* Header */}
-//         <header className="mb-12">
-//           <h1 className="mb-3 text-4xl font-bold text-white">My Resume</h1>
-//           <p className="mb-6 max-w-xl text-lg text-[#cfcfcf]">
-//             A summary of my education, work experience, and the skills I've built
-//             along the way.
-//           </p>
-//           <a
-//             href="#"
-//             className="inline-flex items-center gap-2 rounded bg-[#E50914] px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-[#f6121d]"
-//           >
-//             <Download size={20} />
-//             Download Resume
-//           </a>
-//         </header>
-
-//         {/* Work Experience */}
-//         <h2 className="mb-6 text-2xl font-semibold text-white">
-//           Work Experience
-//         </h2>
-//         <div className="mb-12 space-y-6">
-//           {experience.map((e) => (
-//             <div
-//               key={e.role}
-//               className="rounded-xl border border-white/10 bg-[#1f1f1f] p-5"
-//             >
-//               <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-//                 <h3 className="text-lg font-semibold text-white">{e.role}</h3>
-//                 <span className="text-sm text-[#9b9b9b]">{e.period}</span>
-//               </div>
-//               <p className="mb-3 text-sm text-[#E50914]">{e.company}</p>
-//               <ul className="list-disc pl-5 text-[#cfcfcf]">
-//                 {e.bullets.map((b) => (
-//                   <li key={b}>{b}</li>
-//                 ))}
-//               </ul>
-//             </div>
-//           ))}
-//         </div>
-
-//         {/* Education */}
-//         <h2 className="mb-6 text-2xl font-semibold text-white">Education</h2>
-//         <div className="space-y-6">
-//           {education.map((ed) => (
-//             <div
-//               key={ed.degree}
-//               className="rounded-xl border border-white/10 bg-[#1f1f1f] p-5"
-//             >
-//               <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-//                 <h3 className="text-lg font-semibold text-white">
-//                   {ed.degree}
-//                 </h3>
-//                 <span className="text-sm text-[#9b9b9b]">{ed.period}</span>
-//               </div>
-//               <p className="text-sm text-[#E50914]">{ed.school}</p>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-
 import { useState } from 'react';
-import Navbar from '@/components/Navbar';
+import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
+import { Download, Play, ChevronRight, Award, GraduationCap } from 'lucide-react';
+import Billboard, { OutlineBackdrop } from '@/components/Billboard';
 import CertificateModal from '@/components/CertificateModal';
-import { Download, Eye, Briefcase, GraduationCap, Award } from 'lucide-react';
+import ProjectPoster from '@/components/ProjectPoster';
+import { btnPrimary, btnSecondary, badgeOutline } from '@/components/ui';
+import { profile } from '@/data/profile';
+import { projects } from '@/data/projects';
+import { work, education } from '@/data/experience';
+import { certifications } from '@/data/certifications';
 
-interface ProjectSummary {
-  title: string;
-  period: string;
-  bullets: string[];
+function SectionTitle({ children, note }: { children: ReactNode; note?: ReactNode }) {
+  return (
+    <div className="mb-5 flex items-baseline justify-between gap-4 border-b border-white/10 pb-3">
+      <h2 className="text-xl font-semibold text-white sm:text-2xl">{children}</h2>
+      {note && <span className="text-sm text-nf-muted">{note}</span>}
+    </div>
+  );
 }
-
-interface EducationEntry {
-  degree: string;
-  school: string;
-  period: string;
-  detail: string;
-}
-
-interface Certification {
-  title: string;
-  issuer: string;
-  date: string;
-  certUrl: string;
-}
-
-const projects: ProjectSummary[] = [
-  {
-    title: 'Digital E-Wallet Platform (Microservices Architecture)',
-    period: 'Dec 2025 — Present',
-    bullets: [
-      'Designed and built a distributed E-Wallet backend using microservices for user onboarding, wallet management, and real-time transaction processing.',
-      'Implemented inter-service communication via Spring Cloud OpenFeign (sync) and Apache Kafka (async event-driven messaging) to decouple services.',
-      'Secured REST APIs with Spring Security and JWT-based authentication and authorization across service boundaries.',
-    ],
-  },
-  {
-    title: 'Event-Driven Movie Booking Platform',
-    period: 'Aug 2025 — Nov 2025',
-    bullets: [
-      'Developed a Spring Boot backend for movie listings, show scheduling, and ticket booking with relational data modeling via Spring Data JPA and MySQL.',
-      'Built an event-driven notification pipeline using Apache Kafka to publish booking events and trigger async email confirmations via JavaMail.',
-      'Designed a layered Controller-Service-Repository architecture with role-based authentication via Spring Security.',
-    ],
-  },
-  {
-    title: 'Library Resource Management System',
-    period: 'Feb 2025 — Jun 2025',
-    bullets: [
-      'Built a RESTful backend to manage book inventory, student records, and borrowing transactions with a clean, layered architecture.',
-      'Integrated MySQL using Spring JDBC (JdbcTemplate) for manual SQL query handling and custom object mapping.',
-      'Implemented book issuance and return logic ensuring transactional integrity and data consistency.',
-    ],
-  },
-];
-
-const education: EducationEntry[] = [
-  {
-    degree: 'Bachelor of Computer Applications (BCA)',
-    school: 'Amity University, Noida, Uttar Pradesh',
-    period: 'July 2021 — September 2024',
-    detail: 'CGPA: 7.2',
-  },
-  {
-    degree: 'Senior Secondary Certificate (Class XII)',
-    school: 'Bal Bharati Public School, Noida, Uttar Pradesh',
-    period: 'April 2016 — April 2017',
-    detail: 'Percentage: 76%',
-  },
-];
-
-const certs: Certification[] = [
-  {
-    title: 'Data Structures & Algorithms in Java',
-    issuer: 'Apna College',
-    date: 'Feb 2025',
-    certUrl: '/certificates/dsa-apna-college.pdf',
-  },
-  {
-    title: 'Java Backend Development Program',
-    issuer: 'GeeksforGeeks',
-    date: 'Nov 2025',
-    certUrl: '/certificates/java-backend-gfg.pdf',
-  },
-];
-
-const RESUME_URL = '/resume/resume.pdf';
 
 export default function Resume() {
-  const [activeDoc, setActiveDoc] = useState<{
-    title: string;
-    url: string;
-  } | null>(null);
+  const [activeDoc, setActiveDoc] = useState<{ title: string; url: string } | null>(null);
 
   return (
-    <div className="min-h-screen bg-[#141414] pt-20">
-      <Navbar />
-
-      <div className="mx-auto max-w-3xl px-6 py-12">
-        {/* Header */}
-        <header className="mb-12">
-          <h1 className="mb-3 text-4xl font-bold text-white">
-            My Resume
-          </h1>
-
-          <p className="mb-6 max-w-xl text-lg text-[#cfcfcf]">
-            A summary of my education, technical projects, and the skills
-            I've built along the way.
-          </p>
-
-          <div className="flex flex-wrap gap-4">
+    <>
+      <Billboard
+        compact
+        kicker="Document"
+        title="My Resume"
+        backdrop={<OutlineBackdrop text="CV" />}
+        meta={
+          <>
+            <span className="font-semibold text-green-500">{profile.role}</span>
+            <span className={badgeOutline}>{work.length} {work.length === 1 ? 'role' : 'roles'}</span>
+            <span className={badgeOutline}>{projects.length} projects</span>
+            <span className={badgeOutline}>PDF</span>
+          </>
+        }
+        description="Experience, technical projects, education and certifications, all in one place. Watch it here or take a copy with you."
+        actions={
+          <>
             <button
-              onClick={() =>
-                setActiveDoc({
-                  title: 'Resume',
-                  url: RESUME_URL,
-                })
-              }
-              className="inline-flex items-center gap-2 rounded border border-white/15 bg-[#1f1f1f] px-6 py-3 text-base font-semibold text-white transition-colors hover:border-[#E50914]"
+              onClick={() => setActiveDoc({ title: 'Resume', url: profile.resumeUrl })}
+              className={btnPrimary}
             >
-              <Eye size={20} />
+              <Play size={22} fill="currentColor" />
               View Resume
             </button>
-
-            <a
-              href={RESUME_URL}
-              download
-              className="inline-flex items-center gap-2 rounded bg-[#E50914] px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-[#f6121d]"
-            >
-              <Download size={20} />
-              Download Resume
+            <a href={profile.resumeUrl} download className={btnSecondary}>
+              <Download size={22} />
+              Download
             </a>
-          </div>
-        </header>
+          </>
+        }
+      />
 
-        {/* Technical Projects */}
-        <h2 className="mb-6 flex items-center gap-2 text-2xl font-semibold text-white">
-          <Briefcase
-            size={22}
-            className="text-[#E50914]"
-          />
-          Technical Projects
-        </h2>
-
-        <div className="mb-12 space-y-6">
-          {projects.map((p) => (
-            <div
-              key={p.title}
-              className="rounded-xl border border-white/10 bg-[#1f1f1f] p-5"
-            >
-              <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-                <h3 className="text-lg font-semibold text-white">
-                  {p.title}
-                </h3>
-
-                <span className="text-sm text-[#9b9b9b]">
-                  {p.period}
-                </span>
+      <div className="mx-auto max-w-4xl px-6 pb-12 sm:px-12">
+        {/* Professional Experience */}
+        <section className="mb-14">
+          <SectionTitle
+            note={
+              <Link to="/experience" className="inline-flex items-center gap-1 hover:text-white">
+                Full season <ChevronRight size={16} />
+              </Link>
+            }
+          >
+            Professional Experience
+          </SectionTitle>
+          {work.map((w) => (
+            <div key={`${w.company}-${w.period}`} className="rounded-md bg-nf-surface p-5">
+              <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="text-lg font-semibold text-white">{w.role}</h3>
+                <span className="text-sm font-semibold text-green-500">{w.period}</span>
               </div>
-
-              <ul className="list-disc space-y-1 pl-5 text-[#cfcfcf]">
-                {p.bullets.map((b) => (
-                  <li key={b}>{b}</li>
+              <p className="text-sm text-nf-red-soft">
+                {w.company} · {w.location}
+              </p>
+              <p className="mb-4 mt-1 text-sm italic text-nf-muted">{w.context}</p>
+              <ul className="list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-nf-text sm:text-base">
+                {w.highlights.map(({ detail }) => (
+                  <li key={detail}>{detail}</li>
                 ))}
               </ul>
             </div>
           ))}
-        </div>
+        </section>
+
+        {/* Technical Projects, as an episode list with poster thumbnails */}
+        <section className="mb-14">
+          <SectionTitle note={`${projects.length} titles`}>Technical Projects</SectionTitle>
+          <ol className="divide-y divide-white/10">
+            {projects.map((p, i) => (
+              <li key={p.id} className="flex flex-col gap-4 py-5 sm:flex-row sm:gap-6">
+                <div className="flex shrink-0 items-center gap-4">
+                  <span className="w-6 text-2xl text-nf-muted">{i + 1}</span>
+                  <Link
+                    to={`/projects/${p.id}`}
+                    aria-label={`Open ${p.cardTitle}`}
+                    className="group relative block overflow-hidden rounded"
+                  >
+                    <ProjectPoster project={p} size="sm" className="aspect-video w-40" />
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white text-white">
+                        <Play size={18} fill="currentColor" />
+                      </span>
+                    </span>
+                  </Link>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+                    <h3 className="font-semibold text-white">{p.resume.title}</h3>
+                    <span className="text-sm text-nf-muted">{p.period}</span>
+                  </div>
+                  <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed text-nf-text">
+                    {p.resume.bullets.map((b) => (
+                      <li key={b}>{b}</li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
 
         {/* Education */}
-        <h2 className="mb-6 flex items-center gap-2 text-2xl font-semibold text-white">
-          <GraduationCap
-            size={22}
-            className="text-[#E50914]"
-          />
-          Education
-        </h2>
-
-        <div className="mb-12 space-y-6">
-          {education.map((ed) => (
-            <div
-              key={ed.degree}
-              className="rounded-xl border border-white/10 bg-[#1f1f1f] p-5"
-            >
-              <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-                <h3 className="text-lg font-semibold text-white">
-                  {ed.degree}
-                </h3>
-
-                <span className="text-sm text-[#9b9b9b]">
-                  {ed.period}
-                </span>
+        <section className="mb-14">
+          <SectionTitle>Education</SectionTitle>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {education.map((ed) => (
+              <div key={ed.degree} className="flex gap-4 rounded-md bg-nf-surface p-5">
+                <GraduationCap size={28} className="shrink-0 text-nf-red" />
+                <div>
+                  <h3 className="mb-1 font-semibold text-white">{ed.degree}</h3>
+                  <p className="text-sm text-nf-red-soft">{ed.school}</p>
+                  <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+                    <span className="text-nf-muted">{ed.period}</span>
+                    <span className={badgeOutline}>{ed.detail}</span>
+                  </p>
+                </div>
               </div>
-
-              <p className="text-sm text-[#E50914]">
-                {ed.school}
-              </p>
-
-              <p className="mt-1 text-sm text-[#9b9b9b]">
-                {ed.detail}
-              </p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </section>
 
         {/* Certifications */}
-        <h2 className="mb-6 flex items-center gap-2 text-2xl font-semibold text-white">
-          <Award
-            size={22}
-            className="text-[#E50914]"
-          />
-          Certifications
-        </h2>
-
-        <div className="space-y-6">
-          {certs.map((c) => (
-            <div
-              key={c.title}
-              className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-[#1f1f1f] p-5"
-            >
-              <div>
-                <h3 className="text-lg font-semibold text-white">
-                  {c.title}
-                </h3>
-
-                <p className="text-sm text-[#E50914]">
-                  {c.issuer}
-                </p>
-
-                <p className="mt-1 text-sm text-[#9b9b9b]">
-                  {c.date}
-                </p>
+        <section>
+          <SectionTitle>Certifications</SectionTitle>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {certifications.map((c) => (
+              <div key={c.title} className="flex flex-col gap-4 rounded-md bg-nf-surface p-5">
+                <div className="flex gap-4">
+                  <Award size={28} className="shrink-0 text-amber-400" />
+                  <div>
+                    <h3 className="mb-1 font-semibold text-white">{c.title}</h3>
+                    <p className="text-sm text-nf-red-soft">{c.issuer}</p>
+                    <p className="mt-1 text-sm text-nf-muted">{c.date}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setActiveDoc({ title: c.title, url: c.certUrl })}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded bg-white py-2 text-sm font-semibold text-black transition-colors hover:bg-white/75"
+                >
+                  <Play size={16} fill="currentColor" />
+                  View Certificate
+                </button>
               </div>
-
-              <button
-                onClick={() =>
-                  setActiveDoc({
-                    title: c.title,
-                    url: c.certUrl,
-                  })
-                }
-                className="shrink-0 rounded bg-[#E50914] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#f6121d]"
-              >
-                View Certificate
-              </button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </section>
       </div>
 
       {activeDoc && (
@@ -355,6 +178,6 @@ export default function Resume() {
           onClose={() => setActiveDoc(null)}
         />
       )}
-    </div>
+    </>
   );
 }

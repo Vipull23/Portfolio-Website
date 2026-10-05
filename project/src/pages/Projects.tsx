@@ -1,90 +1,120 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
+import { motion } from 'framer-motion';
+import { Info, Play } from 'lucide-react';
+import Billboard from '@/components/Billboard';
 import CarouselRow from '@/components/CarouselRow';
+import ProjectCard from '@/components/ProjectCard';
+import ProjectPoster from '@/components/ProjectPoster';
+import ProjectPreviewModal from '@/components/ProjectPreviewModal';
+import { btnPrimary, btnSecondary, badgeOutline } from '@/components/ui';
+import { projects, allGenres, isOngoing, projectYear, type Project } from '@/data/projects';
 
-interface Project {
-  id: string;
-  title: string;
-  desc: string;
-  tags: string[];
-  color: string;
-}
-
-const categories: { name: string; projects: Project[] }[] = [
-  {
-    name: 'Backend Projects',
-    projects: [
-      {
-        id: 'digital-e-wallet',
-        title: 'Digital E-Wallet',
-        desc: 'Microservices-based digital wallet with OTP, transfers, and Kafka events.',
-        tags: ['Spring Boot', 'Kafka', 'Redis', 'MySQL'],
-        color: '#3b1f1f',
-      },
-      {
-        id: 'movienow',
-        title: 'MovieNow',
-        desc: 'Event-driven movie ticket booking system with seat validation and async email confirmation.',
-        tags: ['Spring Boot', 'Kafka', 'MySQL', 'JPA'],
-        color: '#1f2a3b',
-      },
-      {
-        id: 'library-system',
-        title: 'Digital Library',
-        desc: 'Spring Boot REST API for student borrowing, author deduplication, and overdue fines — built on raw JDBC.',
-        tags: ['Java', 'Spring Boot', 'JDBC', 'MySQL'],
-        color: '#1f3b2a',
-      },
-    ],
-  },
-];
+const featured = projects.find(isOngoing) ?? projects[0];
+const kafkaProjects = projects.filter((p) => p.tags.some((t) => /kafka/i.test(t)));
 
 export default function Projects() {
+  const [preview, setPreview] = useState<Project | null>(null);
+  const [genre, setGenre] = useState<string>('All');
+
+  const browse = genre === 'All' ? projects : projects.filter((p) => p.genres.includes(genre));
+
   return (
-    <div className="min-h-screen bg-[#141414] pt-20">
-      <Navbar />
-      <div className="mx-auto max-w-6xl px-6 py-12">
-        <h1 className="mb-10 text-4xl font-bold text-white">Projects</h1>
-        {categories.map((cat) => (
-          <CarouselRow key={cat.name} title={cat.name}>
-            {cat.projects.map((p) => (
-              <article
-                key={p.id}
-                className="group relative w-64 shrink-0 snap-start overflow-hidden rounded-xl border border-white/10 bg-[#1f1f1f] transition-all duration-200 hover:scale-105 hover:border-[#E50914]"
-              >
-                <div
-                  className="h-36 w-full"
-                  style={{ backgroundColor: p.color }}
-                />
-                <div className="p-4">
-                  <h3 className="mb-1 text-lg font-semibold text-white">
-                    {p.title}
-                  </h3>
-                  <p className="mb-3 text-sm text-[#9b9b9b]">{p.desc}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {p.tags.map((t) => (
-                      <span
-                        key={t}
-                        className="rounded bg-[#E50914]/20 px-2 py-1 text-xs text-[#ff5a5f]"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <Link
-                  to={`/projects/${p.id}`}
-                  className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-                >
-                  <span className="rounded bg-[#E50914] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#f6121d]">
-                    View Project
-                  </span>
-                </Link>
-              </article>
+    <>
+      <Billboard
+        kicker="Series"
+        title={featured.cardTitle}
+        backdrop={
+          <ProjectPoster
+            project={featured}
+            bare
+            className="h-full w-full [mask-image:linear-gradient(to_left,black_45%,transparent)]"
+          />
+        }
+        meta={
+          <>
+            <span className="font-semibold text-green-500">
+              {isOngoing(featured) ? 'New Episodes' : projectYear(featured)}
+            </span>
+            <span className="text-nf-text">{featured.period}</span>
+            <span className={badgeOutline}>{featured.endpoints.length} APIs</span>
+            <span className={badgeOutline}>{featured.architecture.services.length} services</span>
+          </>
+        }
+        description={featured.tagline}
+        actions={
+          <>
+            <Link to={`/projects/${featured.id}`} className={btnPrimary}>
+              <Play size={22} fill="currentColor" />
+              View Case Study
+            </Link>
+            <button onClick={() => setPreview(featured)} className={btnSecondary}>
+              <Info size={22} />
+              More Info
+            </button>
+          </>
+        }
+      />
+
+      <div className="relative z-10 -mt-10 px-4 pb-8 sm:px-10">
+        <CarouselRow title={`Top ${projects.length} Backend Projects`}>
+          {projects.map((p, i) => (
+            <ProjectCard key={p.id} project={p} rank={i + 1} onMoreInfo={setPreview} />
+          ))}
+        </CarouselRow>
+
+        {kafkaProjects.length > 0 && (
+          <CarouselRow title="Because You Like Event-Driven Systems">
+            {kafkaProjects.map((p) => (
+              <ProjectCard key={p.id} project={p} onMoreInfo={setPreview} />
             ))}
           </CarouselRow>
-        ))}
+        )}
+
+        {/* Browse by genre */}
+        <section className="mb-10">
+          <div className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <h2 className="text-xl font-semibold text-white sm:text-2xl">Browse by Genre</h2>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Filter projects by genre">
+              {['All', ...allGenres].map((g) => (
+                <button
+                  key={g}
+                  onClick={() => setGenre(g)}
+                  aria-pressed={genre === g}
+                  className={`rounded-full border px-3.5 py-1 text-sm transition-colors ${
+                    genre === g
+                      ? 'border-white bg-white text-black'
+                      : 'border-white/30 text-nf-text hover:border-white hover:text-white'
+                  }`}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
+          </div>
+          <motion.div layout className="flex flex-wrap gap-4 px-2 py-4">
+            {browse.map((p) => (
+              <motion.div
+                key={p.id}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.25 }}
+              >
+                <ProjectCard project={p} onMoreInfo={setPreview} />
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
       </div>
-    </div>
+
+      {preview && (
+        <ProjectPreviewModal
+          project={preview}
+          onClose={() => setPreview(null)}
+          onSelect={setPreview}
+        />
+      )}
+    </>
   );
 }

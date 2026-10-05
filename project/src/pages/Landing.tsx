@@ -2,7 +2,8 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProfileTile from '@/components/ProfileTile';
-import { User, FolderGit2, Award, FileText } from 'lucide-react';
+import { User, Briefcase, FolderGit2, Award, FileText } from 'lucide-react';
+import { profile } from '@/data/profile';
 
 const tiles = [
   {
@@ -10,6 +11,12 @@ const tiles = [
     label: 'About Me',
     icon: <User size={56} />,
     thumbnailClass: 'bg-gradient-to-br from-[#2a1f1f] to-[#3b2a2a]',
+  },
+  {
+    to: '/experience',
+    label: 'Experience',
+    icon: <Briefcase size={56} />,
+    thumbnailClass: 'bg-gradient-to-br from-[#2a1f3b] to-[#3b2a4a]',
   },
   {
     to: '/projects',
@@ -44,23 +51,30 @@ export default function Landing() {
   );
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-[#141414] px-4 py-16">
-      {/* Profile photo */}
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-nf-bg px-4 py-16">
+      {/* Profile avatar */}
       <div className="absolute left-4 top-4 sm:left-8 sm:top-8">
-        <div className="h-10 w-10 overflow-hidden rounded-full border border-white/20 bg-[#2a2a2a]">
+        {profile.avatarUrl ? (
           <img
-            src="https://images.unsplash.com/photo-1633332755192-723a6f1c9d05?w=80&h=80&fit=crop"
-            alt="Vipul Sharma"
-            className="h-full w-full object-cover"
+            src={profile.avatarUrl}
+            alt={profile.name}
+            className="h-10 w-10 rounded object-cover"
           />
-        </div>
+        ) : (
+          <div
+            aria-label={profile.name}
+            className="flex h-10 w-10 items-center justify-center rounded bg-nf-red text-sm font-bold text-white"
+          >
+            {profile.initials}
+          </div>
+        )}
       </div>
 
       {/* Selection overlay */}
       <AnimatePresence>
         {selected !== null && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#141414]"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-nf-bg"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
@@ -90,51 +104,55 @@ export default function Landing() {
         }`}
       >
         {/* Wordmark */}
-        <h1 className="mb-8 animate-fade-up text-5xl font-extrabold tracking-tighter text-[#E50914] sm:text-7xl">
-          VIPUL SHARMA
+        <h1 className="mb-8 animate-fade-up text-center text-5xl font-extrabold uppercase tracking-tighter text-nf-red sm:text-7xl">
+          {profile.name}
         </h1>
 
         {/* Heading */}
-        <h2 className="mb-3 animate-fade-up text-2xl font-medium text-white sm:text-4xl">
+        <h2
+          className="mb-3 animate-fade-up text-center text-2xl font-medium text-white sm:text-4xl"
+          style={{ animationDelay: '0.1s' }}
+        >
           Choose what you'd like to explore
         </h2>
-        <p className="mb-10 animate-fade-up text-base text-[#9b9b9b]">
+        <p
+          className="mb-10 animate-fade-up text-center text-base text-nf-muted"
+          style={{ animationDelay: '0.2s' }}
+        >
           Discover my work, experience and technical journey.
         </p>
 
-        {/* Profile tiles */}
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-10">
+        {/* Profile tiles: the CSS entrance animation sits on the wrapper so it
+            doesn't fight framer-motion's opacity/scale on the inner element. */}
+        <div className="flex max-w-5xl flex-wrap justify-center gap-6 sm:gap-10">
           {tiles.map((tile, i) => (
-            <motion.div
+            <div
               key={tile.to}
               className="animate-fade-up"
-              style={{ animationDelay: `${0.1 * (i + 1)}s` }}
-              initial={{ opacity: 1 }}
-              animate={{
-                opacity: selected === null ? 1 : selected === i ? 0 : 0.2,
-                scale: selected === null ? 1 : selected === i ? 1.3 : 0.9,
-              }}
-              transition={{ duration: 0.4 }}
+              style={{ animationDelay: `${0.3 + 0.1 * i}s` }}
             >
-              <ProfileTile
-                label={tile.label}
-                icon={tile.icon}
-                thumbnailClass={tile.thumbnailClass}
-                onClick={() => handleSelect(i, tile.to)}
-              />
-            </motion.div>
+              <motion.div
+                animate={{
+                  opacity: selected === null ? 1 : selected === i ? 0 : 0.2,
+                  scale: selected === null ? 1 : selected === i ? 1.3 : 0.9,
+                }}
+                transition={{ duration: 0.4 }}
+              >
+                <ProfileTile
+                  label={tile.label}
+                  icon={tile.icon}
+                  thumbnailClass={tile.thumbnailClass}
+                  onClick={() => handleSelect(i, tile.to)}
+                />
+              </motion.div>
+            </div>
           ))}
         </div>
-
-        {/* Manage profiles link */}
-        <button className="mt-12 text-base text-[#9b9b9b] transition-colors hover:text-white">
-          Manage Profiles
-        </button>
       </div>
 
       {/* Footer */}
-      <footer className="pt-8 text-center text-xs text-[#6b6b6b]">
-        © {new Date().getFullYear()} Vipul Sharma. All rights reserved.
+      <footer className="pt-8 text-center text-xs text-nf-dim">
+        © {new Date().getFullYear()} {profile.name}. All rights reserved.
       </footer>
     </div>
   );
