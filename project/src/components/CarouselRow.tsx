@@ -38,44 +38,43 @@ export default function CarouselRow({ title, children }: CarouselRowProps) {
     });
   };
 
-  const hasOverflow = canScrollLeft || canScrollRight;
+  // Netflix-style edge arrows: overlaid on the row and revealed on hover (desktop only; phones swipe).
   const arrowClass =
-    'hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-nf-surface sm:flex text-white shadow-lg transition-all duration-200 hover:bg-nf-red';
+    'absolute inset-y-4 z-20 hidden w-12 items-center justify-center bg-black/60 text-white opacity-0 transition-opacity duration-200 hover:bg-black/80 focus-visible:opacity-100 group-hover/row:opacity-100 sm:flex';
 
   return (
     <section className="mb-10">
       <h2 className="mb-2 text-xl font-semibold text-white sm:text-2xl">
         {title}
       </h2>
-      <div className="flex items-center gap-2">
-        {hasOverflow && (
+      <div className="group/row relative">
+        {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
             aria-label={`Scroll ${title} left`}
-            disabled={!canScrollLeft}
-            className={`${arrowClass} ${canScrollLeft ? '' : 'pointer-events-none opacity-0'}`}
+            className={`${arrowClass} left-0 rounded-r`}
           >
-            <ChevronLeft size={22} />
+            <ChevronLeft size={32} />
           </button>
         )}
 
-        {/* Padding gives hover-scaled cards room so the scroll container doesn't clip them. */}
+        {/* Padding gives hover-scaled cards room so the scroll container doesn't clip them;
+            the negative margin keeps the first card aligned with the row title. */}
         <div
           ref={scrollRef}
           onScroll={updateArrows}
-          className="flex min-w-0 flex-1 snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-2 py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="-mx-2 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-2 py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {children}
         </div>
 
-        {hasOverflow && (
+        {canScrollRight && (
           <button
             onClick={() => scroll('right')}
             aria-label={`Scroll ${title} right`}
-            disabled={!canScrollRight}
-            className={`${arrowClass} ${canScrollRight ? '' : 'pointer-events-none opacity-0'}`}
+            className={`${arrowClass} right-0 rounded-l`}
           >
-            <ChevronRight size={22} />
+            <ChevronRight size={32} />
           </button>
         )}
       </div>

@@ -8,6 +8,7 @@ import CertificateModal from '@/components/CertificateModal';
 import { btnCircle, btnPrimary, btnSecondary, badgeOutline } from '@/components/ui';
 import { skillGroups, allSkills, topSkills, usedIn, type Skill } from '@/data/skills';
 import { certifications, type Certification } from '@/data/certifications';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const iconSize = '[&>svg]:h-full [&>svg]:w-full';
 
@@ -122,6 +123,7 @@ function CertificateCard({ cert, onView }: { cert: Certification; onView: () => 
 }
 
 export default function Skills() {
+  useDocumentTitle('Skills & Certifications');
   const [activeCert, setActiveCert] = useState<Certification | null>(null);
   const [query, setQuery] = useState('');
 
@@ -157,7 +159,7 @@ export default function Skills() {
         }
       />
 
-      <div className="relative z-10 -mt-6 px-4 pb-8 sm:px-10">
+      <div className="relative z-10 -mt-6 px-6 pb-8 sm:px-12">
         {/* Search, Netflix-style */}
         <div className="mb-8 flex max-w-md items-center gap-3 border border-white/30 bg-black/60 px-3 py-2 focus-within:border-white">
           <Search size={20} className="shrink-0 text-nf-muted" />

@@ -4,10 +4,12 @@ import { FileText, Play } from 'lucide-react';
 import Billboard, { OutlineBackdrop } from '@/components/Billboard';
 import { btnPrimary, btnSecondary, badgeOutline, tagRed } from '@/components/ui';
 import { work } from '@/data/experience';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const episodesId = (i: number) => `episodes-${i}`;
 
 export default function Experience() {
+  useDocumentTitle('Experience');
   return (
     <>
       {work.map((job, jobIndex) => (
@@ -61,7 +63,7 @@ export default function Experience() {
           />
 
           {/* Episodes: one per highlight */}
-          <section id={episodesId(jobIndex)} className="mx-auto max-w-5xl scroll-mt-24 px-6 pb-16 sm:px-12">
+          <section id={episodesId(jobIndex)} className="max-w-5xl scroll-mt-24 px-6 pb-16 sm:px-12">
             <div className="mb-4 flex items-baseline justify-between border-b border-white/10 pb-4">
               <h2 className="text-2xl font-semibold text-white">Episodes</h2>
               <span className="text-sm text-nf-muted">{job.highlights.length} highlights</span>

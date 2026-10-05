@@ -85,3 +85,6 @@ After that, the next feature to build is the **Projects billboard and poster car
 - [x] Experience page: a 5th landing tile plus `/experience`, in Netflix "series + episodes" style, driven by `work` in `src/data/experience.ts`. Done 2026-10-05.
 - [x] Projects billboard hero + poster-style cards.
 - [x] Netflix redesign of every page (2026-10-05): shared `Billboard`, transparent-on-top navbar, footer; Projects (poster art, Top 3 row, genre filter, hover cards, "More Info" preview modal); ProjectDetail (episodes, behind the scenes, more like this); Skills (Top 10, search, "Seen in" links computed from project/work data, certificate cards); Resume and Experience billboards.
+- [x] Review fixes (2026-10-05): landing redesigned as Netflix "Who's exploring?" with vivid profiles, "V" intro (once per session, skipped for reduced motion), Download Resume button; content left-aligned with the billboard; billboard art on phones; per-page tab titles; reduced-motion support; per-page code splitting; screenshot lightbox ("Trailers & More"); link-preview image + app icons (sources in `scripts/`).
+- [ ] Add Vipul's photo (`avatarUrl` in `src/data/profile.ts`) and Postman screenshots (`screenshots` in `src/data/projects.tsx`, files in `public/screenshots/`).
+- [ ] After deploying: make `og:image` in `index.html` an absolute URL and add `og:url`.

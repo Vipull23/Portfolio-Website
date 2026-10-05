@@ -1,46 +1,46 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { User, Briefcase, FolderGit2, Award, FileText, Download } from 'lucide-react';
 import ProfileTile from '@/components/ProfileTile';
-import { User, Briefcase, FolderGit2, Award, FileText } from 'lucide-react';
+import Intro from '@/components/Intro';
 import { profile } from '@/data/profile';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
+// Bright, flat profile colours, like Netflix's default avatars.
 const tiles = [
-  {
-    to: '/about',
-    label: 'About Me',
-    icon: <User size={56} />,
-    thumbnailClass: 'bg-gradient-to-br from-[#2a1f1f] to-[#3b2a2a]',
-  },
-  {
-    to: '/experience',
-    label: 'Experience',
-    icon: <Briefcase size={56} />,
-    thumbnailClass: 'bg-gradient-to-br from-[#2a1f3b] to-[#3b2a4a]',
-  },
-  {
-    to: '/projects',
-    label: 'Projects',
-    icon: <FolderGit2 size={56} />,
-    thumbnailClass: 'bg-gradient-to-br from-[#1f2a3b] to-[#2a3b4a]',
-  },
-  {
-    to: '/skills',
-    label: 'Skills & Certs',
-    icon: <Award size={56} />,
-    thumbnailClass: 'bg-gradient-to-br from-[#1f3b2a] to-[#2a4a3b]',
-  },
-  {
-    to: '/resume',
-    label: 'Resume',
-    icon: <FileText size={56} />,
-    thumbnailClass: 'bg-gradient-to-br from-[#3b2a1f] to-[#4a3a2a]',
-  },
+  { to: '/about', label: 'About Me', icon: <User />, color: 'bg-[#2563eb]' },
+  { to: '/experience', label: 'Experience', icon: <Briefcase />, color: 'bg-[#e5a00d]' },
+  { to: '/projects', label: 'Projects', icon: <FolderGit2 />, color: 'bg-nf-red' },
+  { to: '/skills', label: 'Skills & Certs', icon: <Award />, color: 'bg-[#0d9488]' },
+  { to: '/resume', label: 'Resume', icon: <FileText />, color: 'bg-[#7c3aed]' },
 ];
 
+const INTRO_KEY = 'intro-seen';
+
+function shouldPlayIntro() {
+  try {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+    return sessionStorage.getItem(INTRO_KEY) !== '1';
+  } catch {
+    return false;
+  }
+}
+
 export default function Landing() {
+  useDocumentTitle();
   const navigate = useNavigate();
   const [selected, setSelected] = useState<number | null>(null);
+  const [showIntro, setShowIntro] = useState(shouldPlayIntro);
+
+  const finishIntro = useCallback(() => {
+    setShowIntro(false);
+    try {
+      sessionStorage.setItem(INTRO_KEY, '1');
+    } catch {
+      // Storage can be unavailable (private mode); the intro just plays again next time.
+    }
+  }, []);
 
   const handleSelect = useCallback(
     (index: number, to: string) => {
@@ -51,26 +51,17 @@ export default function Landing() {
   );
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-nf-bg px-4 py-16">
-      {/* Profile avatar */}
-      <div className="absolute left-4 top-4 sm:left-8 sm:top-8">
-        {profile.avatarUrl ? (
-          <img
-            src={profile.avatarUrl}
-            alt={profile.name}
-            className="h-10 w-10 rounded object-cover"
-          />
-        ) : (
-          <div
-            aria-label={profile.name}
-            className="flex h-10 w-10 items-center justify-center rounded bg-nf-red text-sm font-bold text-white"
-          >
-            {profile.initials}
-          </div>
-        )}
-      </div>
+    <div className="relative flex min-h-screen flex-col bg-nf-bg">
+      <AnimatePresence>{showIntro && <Intro key="intro" onDone={finishIntro} />}</AnimatePresence>
 
-      {/* Selection overlay */}
+      {/* Header: logo top-left, like Netflix */}
+      <header className="px-6 py-5 sm:px-12 sm:py-6">
+        <span className="text-2xl font-extrabold uppercase tracking-tighter text-nf-red sm:text-3xl">
+          {profile.name}
+        </span>
+      </header>
+
+      {/* Selection overlay: the chosen profile zooms in before navigating */}
       <AnimatePresence>
         {selected !== null && (
           <motion.div
@@ -86,50 +77,33 @@ export default function Landing() {
               transition={{ duration: 0.5, ease: 'easeOut' }}
             >
               <div
-                className={`flex h-32 w-32 items-center justify-center rounded-lg text-white/80 sm:h-40 sm:w-40 ${tiles[selected].thumbnailClass}`}
+                className={`flex h-28 w-28 items-center justify-center rounded-md text-white sm:h-36 sm:w-36 [&>svg]:h-1/2 [&>svg]:w-1/2 [&>svg]:stroke-[2.25] ${tiles[selected].color}`}
               >
                 {tiles[selected].icon}
               </div>
-              <span className="mt-3 text-lg text-white sm:text-2xl">
-                {tiles[selected].label}
-              </span>
+              <span className="mt-3 text-lg text-white sm:text-2xl">{tiles[selected].label}</span>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div
-        className={`flex flex-1 flex-col items-center justify-center transition-opacity duration-300 ${
+      <main
+        className={`flex flex-1 flex-col items-center justify-center px-4 pb-10 transition-opacity duration-300 ${
           selected !== null ? 'opacity-0' : 'opacity-100'
         }`}
       >
-        {/* Wordmark */}
-        <h1 className="mb-8 animate-fade-up text-center text-5xl font-extrabold uppercase tracking-tighter text-nf-red sm:text-7xl">
-          {profile.name}
+        <h1 className="mb-8 text-center text-3xl font-medium text-white motion-safe:animate-fade-up sm:mb-12 sm:text-5xl lg:text-6xl">
+          Who's exploring?
         </h1>
 
-        {/* Heading */}
-        <h2
-          className="mb-3 animate-fade-up text-center text-2xl font-medium text-white sm:text-4xl"
-          style={{ animationDelay: '0.1s' }}
-        >
-          Choose what you'd like to explore
-        </h2>
-        <p
-          className="mb-10 animate-fade-up text-center text-base text-nf-muted"
-          style={{ animationDelay: '0.2s' }}
-        >
-          Discover my work, experience and technical journey.
-        </p>
-
-        {/* Profile tiles: the CSS entrance animation sits on the wrapper so it
-            doesn't fight framer-motion's opacity/scale on the inner element. */}
-        <div className="flex max-w-5xl flex-wrap justify-center gap-6 sm:gap-10">
+        {/* The CSS entrance animation sits on the wrapper so it doesn't fight
+            framer-motion's opacity/scale on the inner element. */}
+        <div className="flex max-w-[22rem] flex-wrap justify-center gap-x-4 gap-y-6 sm:max-w-5xl sm:gap-x-8 lg:gap-x-10">
           {tiles.map((tile, i) => (
             <div
               key={tile.to}
-              className="animate-fade-up"
-              style={{ animationDelay: `${0.3 + 0.1 * i}s` }}
+              className="motion-safe:animate-fade-up"
+              style={{ animationDelay: `${0.1 + 0.08 * i}s` }}
             >
               <motion.div
                 animate={{
@@ -141,18 +115,28 @@ export default function Landing() {
                 <ProfileTile
                   label={tile.label}
                   icon={tile.icon}
-                  thumbnailClass={tile.thumbnailClass}
+                  colorClass={tile.color}
                   onClick={() => handleSelect(i, tile.to)}
                 />
               </motion.div>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Footer */}
-      <footer className="pt-8 text-center text-xs text-nf-dim">
-        © {new Date().getFullYear()} {profile.name}. All rights reserved.
+        {/* Netflix's "Manage Profiles" button, put to work */}
+        <a
+          href={profile.resumeUrl}
+          download
+          className="mt-12 inline-flex items-center gap-2 border border-nf-muted px-6 py-2 text-sm uppercase tracking-[0.2em] text-nf-muted transition-colors motion-safe:animate-fade-up hover:border-white hover:text-white sm:mt-16 sm:text-base"
+          style={{ animationDelay: '0.6s' }}
+        >
+          <Download size={18} />
+          Download Resume
+        </a>
+      </main>
+
+      <footer className="pb-6 text-center text-xs text-nf-dim">
+        © {new Date().getFullYear()} {profile.name}
       </footer>
     </div>
   );

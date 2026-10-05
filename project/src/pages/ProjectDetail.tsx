@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ChevronDown, Github } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Github, Maximize2 } from 'lucide-react';
 import Billboard from '@/components/Billboard';
 import ProjectCard from '@/components/ProjectCard';
 import ProjectPoster from '@/components/ProjectPoster';
 import ProjectPreviewModal from '@/components/ProjectPreviewModal';
+import ImageLightbox from '@/components/ImageLightbox';
 import { btnPrimary, btnSecondary, badgeOutline } from '@/components/ui';
 import { getProject, projects, projectYear, type Project } from '@/data/projects';
 import NotFound from '@/pages/NotFound';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const methodColors: Record<string, string> = {
   GET: 'bg-green-500/20 text-green-400 border-green-500/30',
@@ -92,11 +94,14 @@ function MetaRow({ label, items }: { label: string; items: string[] }) {
 export default function ProjectDetail() {
   const { projectId } = useParams<{ projectId: string }>();
   const project = getProject(projectId);
+  useDocumentTitle(project?.cardTitle ?? 'Page Not Found');
   const [preview, setPreview] = useState<Project | null>(null);
+  const [shotIndex, setShotIndex] = useState<number | null>(null);
 
   // Opening another title from the preview navigates here again; close the old preview.
   useEffect(() => {
     setPreview(null);
+    setShotIndex(null);
   }, [projectId]);
 
   if (!project) {
@@ -115,7 +120,7 @@ export default function ProjectDetail() {
           <ProjectPoster
             project={project}
             bare
-            className="h-full w-full [mask-image:linear-gradient(to_left,black_45%,transparent)]"
+            className="h-full w-full [mask-image:linear-gradient(to_bottom,black_45%,transparent)] md:[mask-image:linear-gradient(to_left,black_45%,transparent)]"
           />
         }
         meta={
@@ -146,7 +151,7 @@ export default function ProjectDetail() {
         }
       />
 
-      <div className="mx-auto max-w-5xl px-6 pb-12 sm:px-12">
+      <div className="max-w-5xl px-6 pb-12 sm:px-12">
         {/* Overview */}
         <section className="mb-16 grid gap-8 md:grid-cols-[2fr_1fr]">
           <div>
@@ -289,19 +294,32 @@ export default function ProjectDetail() {
           </div>
         </section>
 
-        {/* Screenshots */}
+        {/* Screenshots, as Netflix's "Trailers & More" row; click to view full size */}
         {project.screenshots.length > 0 && (
           <section className="mb-16">
-            <SectionTitle>Screenshots</SectionTitle>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {project.screenshots.map((shot) => (
-                <figure
+            <SectionTitle note={`${project.screenshots.length} screenshots`}>Trailers & More</SectionTitle>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {project.screenshots.map((shot, i) => (
+                <button
                   key={shot.src}
-                  className="overflow-hidden rounded-lg border border-white/10 bg-nf-panel"
+                  onClick={() => setShotIndex(i)}
+                  className="group overflow-hidden rounded-md bg-nf-surface text-left"
                 >
-                  <img src={shot.src} alt={shot.caption} loading="lazy" className="w-full" />
-                  <figcaption className="px-4 py-3 text-sm text-nf-muted">{shot.caption}</figcaption>
-                </figure>
+                  <div className="relative aspect-video overflow-hidden bg-nf-panel">
+                    <img
+                      src={shot.src}
+                      alt={shot.caption}
+                      loading="lazy"
+                      className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                      <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white text-white">
+                        <Maximize2 size={20} />
+                      </span>
+                    </span>
+                  </div>
+                  <p className="px-3 py-2.5 text-sm text-nf-text">{shot.caption}</p>
+                </button>
               ))}
             </div>
           </section>
@@ -319,6 +337,15 @@ export default function ProjectDetail() {
           </section>
         )}
       </div>
+
+      {shotIndex !== null && (
+        <ImageLightbox
+          images={project.screenshots}
+          index={shotIndex}
+          onIndexChange={setShotIndex}
+          onClose={() => setShotIndex(null)}
+        />
+      )}
 
       {preview && (
         <ProjectPreviewModal

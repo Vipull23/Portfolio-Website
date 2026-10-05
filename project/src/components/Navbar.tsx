@@ -37,7 +37,7 @@ export default function Navbar() {
         solid ? 'bg-nf-bg/95 shadow-md backdrop-blur' : 'bg-gradient-to-b from-black/80 to-transparent'
       }`}
     >
-      <div className="flex items-center justify-between px-4 py-3 sm:px-8 sm:py-4">
+      <div className="flex items-center justify-between px-6 py-3 sm:px-12 sm:py-4">
         <div className="flex items-center gap-4 lg:gap-10">
           <div className="flex items-center gap-4">
             <Link
@@ -72,9 +72,13 @@ export default function Navbar() {
           <Link
             to="/"
             aria-label="Switch profile"
-            className="hidden h-8 w-8 items-center justify-center rounded bg-nf-red text-xs font-bold text-white md:flex"
+            className="hidden h-8 w-8 items-center justify-center overflow-hidden rounded bg-nf-red text-xs font-bold text-white md:flex"
           >
-            {profile.initials}
+            {profile.avatarUrl ? (
+              <img src={profile.avatarUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              profile.initials
+            )}
           </Link>
           <button
             onClick={() => setMenuOpen((o) => !o)}
@@ -88,7 +92,7 @@ export default function Navbar() {
       </div>
 
       {menuOpen && (
-        <div className="border-t border-white/10 px-4 pb-3 md:hidden">
+        <div className="border-t border-white/10 px-6 pb-3 md:hidden">
           {links.map((l) => (
             <Link
               key={l.to}

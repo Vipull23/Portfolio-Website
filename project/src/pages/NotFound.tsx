@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 interface NotFoundProps {
   message?: string;
@@ -7,6 +8,7 @@ interface NotFoundProps {
 export default function NotFound({
   message = "Sorry, we can't find that page. You'll find lots to explore on the home page.",
 }: NotFoundProps) {
+  useDocumentTitle('Page Not Found');
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pt-20">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(229,9,20,0.15),transparent_60%)]" />

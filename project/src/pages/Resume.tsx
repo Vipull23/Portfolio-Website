@@ -10,6 +10,7 @@ import { profile } from '@/data/profile';
 import { projects } from '@/data/projects';
 import { work, education } from '@/data/experience';
 import { certifications } from '@/data/certifications';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 function SectionTitle({ children, note }: { children: ReactNode; note?: ReactNode }) {
   return (
@@ -21,6 +22,7 @@ function SectionTitle({ children, note }: { children: ReactNode; note?: ReactNod
 }
 
 export default function Resume() {
+  useDocumentTitle('Resume');
   const [activeDoc, setActiveDoc] = useState<{ title: string; url: string } | null>(null);
 
   return (
@@ -56,7 +58,7 @@ export default function Resume() {
         }
       />
 
-      <div className="mx-auto max-w-4xl px-6 pb-12 sm:px-12">
+      <div className="max-w-4xl px-6 pb-12 sm:px-12">
         {/* Professional Experience */}
         <section className="mb-14">
           <SectionTitle

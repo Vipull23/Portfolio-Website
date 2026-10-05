@@ -9,11 +9,13 @@ import ProjectPoster from '@/components/ProjectPoster';
 import ProjectPreviewModal from '@/components/ProjectPreviewModal';
 import { btnPrimary, btnSecondary, badgeOutline } from '@/components/ui';
 import { projects, allGenres, isOngoing, projectYear, type Project } from '@/data/projects';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const featured = projects.find(isOngoing) ?? projects[0];
 const kafkaProjects = projects.filter((p) => p.tags.some((t) => /kafka/i.test(t)));
 
 export default function Projects() {
+  useDocumentTitle('Projects');
   const [preview, setPreview] = useState<Project | null>(null);
   const [genre, setGenre] = useState<string>('All');
 
@@ -28,7 +30,7 @@ export default function Projects() {
           <ProjectPoster
             project={featured}
             bare
-            className="h-full w-full [mask-image:linear-gradient(to_left,black_45%,transparent)]"
+            className="h-full w-full [mask-image:linear-gradient(to_bottom,black_45%,transparent)] md:[mask-image:linear-gradient(to_left,black_45%,transparent)]"
           />
         }
         meta={
@@ -56,7 +58,7 @@ export default function Projects() {
         }
       />
 
-      <div className="relative z-10 -mt-10 px-4 pb-8 sm:px-10">
+      <div className="relative z-10 -mt-10 px-6 pb-8 sm:px-12">
         <CarouselRow title={`Top ${projects.length} Backend Projects`}>
           {projects.map((p, i) => (
             <ProjectCard key={p.id} project={p} rank={i + 1} onMoreInfo={setPreview} />

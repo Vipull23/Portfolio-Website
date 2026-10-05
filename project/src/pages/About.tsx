@@ -8,6 +8,7 @@ import { profile } from '@/data/profile';
 import { work } from '@/data/experience';
 import { projects } from '@/data/projects';
 import { certifications } from '@/data/certifications';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const latestJob = work[0];
 const ongoingProject = projects[0];
@@ -46,6 +47,7 @@ const fadeUp = {
 };
 
 export default function About() {
+  useDocumentTitle('About');
   return (
     <>
       <Billboard
@@ -56,7 +58,7 @@ export default function About() {
             <img
               src={profile.avatarUrl}
               alt=""
-              className="h-full w-full object-cover opacity-60 [mask-image:linear-gradient(to_left,black_40%,transparent)]"
+              className="h-full w-full object-cover object-top opacity-60 [mask-image:linear-gradient(to_bottom,black_40%,transparent)] md:[mask-image:linear-gradient(to_left,black_40%,transparent)]"
             />
           ) : (
             <OutlineBackdrop text={profile.initials} />
@@ -94,7 +96,7 @@ export default function About() {
         }
       />
 
-      <div className="mx-auto max-w-6xl px-6 pb-20 sm:px-12">
+      <div className="max-w-6xl px-6 pb-20 sm:px-12">
         {/* Synopsis + details, like a Netflix title's "About" panel */}
         <motion.section {...fadeUp} className="mb-16 grid gap-10 md:grid-cols-[2fr_1fr]">
           <div>

@@ -34,13 +34,18 @@ export default function Billboard({
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_10%_90%,rgba(229,9,20,0.12),transparent_50%)]" />
 
       {backdrop && (
-        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 hidden w-3/5 md:block">
+        // Phones: art fills the top of the hero above the text. Desktop: art sits on the right.
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-3/5 md:inset-x-auto md:inset-y-0 md:right-0 md:h-full md:w-3/5"
+        >
           {backdrop}
         </div>
       )}
 
       {/* Netflix-style fades into the page background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-nf-bg via-nf-bg/70 to-transparent" />
+      <div className="absolute inset-0 hidden bg-gradient-to-r from-nf-bg via-nf-bg/70 to-transparent md:block" />
+      <div className="absolute inset-0 bg-gradient-to-t from-nf-bg via-nf-bg/60 to-transparent md:hidden" />
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-nf-bg to-transparent" />
 
       <motion.div
@@ -75,7 +80,7 @@ export default function Billboard({
 /** Giant outlined lettering, used as backdrop art when there's no image. */
 export function OutlineBackdrop({ text }: { text: string }) {
   return (
-    <span className="absolute -right-10 top-1/2 -translate-y-1/2 select-none whitespace-nowrap text-[22rem] font-black leading-none tracking-tighter text-transparent [-webkit-text-stroke:2px_rgba(255,255,255,0.07)]">
+    <span className="absolute -right-10 top-1/2 -translate-y-1/2 select-none whitespace-nowrap text-[11rem] font-black leading-none sm:text-[16rem] md:text-[22rem] tracking-tighter text-transparent [-webkit-text-stroke:2px_rgba(255,255,255,0.07)]">
       {text}
     </span>
   );
